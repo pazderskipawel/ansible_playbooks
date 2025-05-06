@@ -1,8 +1,0 @@
-[steamdeck]
-192.168.0.53
-
-[steamdeck:vars]
-ansible_user=deck
-ansible_password=@dm!n
-ansible_sudo_pass=@dm!n
-

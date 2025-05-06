@@ -1,0 +1,3 @@
+ansible_user: "deck"
+ansible_password: "@dm!n"
+ansible_sudo_pass: "@dm!n"

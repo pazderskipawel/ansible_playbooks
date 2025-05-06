@@ -1,6 +1,6 @@
 ---
 - name: Configure Samba on Steam Deck
-  hosts: steamdeck
+  hosts: steamdeck1
   roles: 
     - arch_pacman
 
@@ -16,7 +16,7 @@
         name: samba
         state: present
 
-    - name: Copy smb.conf template to /etc/samba/smb.conf
+    - name: Copy samba configuration from template
       become: true
       copy:
         src: samba/samba.conf.template
@@ -32,13 +32,18 @@
         name: pexpect
       when: pexpect_check.rc != 0
 
-    - name: Set Samba user password
+
+    - name: Get Samba user credentials
+      include_vars: 
+        file: samba/var.yml
+
+    - name: Set Samba user
       become: true
       expect:
-        command: smbpasswd -a deck
+        command: "smbpasswd -a {{ samba_user_name }}"
         responses:
-          "New SMB password:": "pass"
-          "Retype new SMB password:": "pass"
+          "New SMB password:": "{{ samba_user_password }}"
+          "Retype new SMB password:": "{{ samba_user_password }}"
 
     - name: Enable smb service
       become: true
