@@ -1,0 +1,69 @@
+---
+- name: Configure Samba on Steam Deck
+  hosts: steamdeck
+  roles: 
+    - arch_pacman
+
+  tasks:
+    - name: Disable steamdeck readonly
+      include_role:
+        name: steamdeck
+        tasks_from: disable_readonly.yml
+
+    - name: Install Samba packages
+      become: true
+      pacman:
+        name: samba
+        state: present
+
+    - name: Copy smb.conf template to /etc/samba/smb.conf
+      become: true
+      copy:
+        src: samba/samba.conf.template
+        dest: /etc/samba/smb.conf
+
+    - name: Check if pexpect is installed
+      command: python -c "import pexpect"
+      register: pexpect_check
+      ignore_errors: true
+
+    - name: Install pexpect if not present
+      pip:
+        name: pexpect
+      when: pexpect_check.rc != 0
+
+    - name: Set Samba user password
+      become: true
+      expect:
+        command: smbpasswd -a deck
+        responses:
+          "New SMB password:": "pass"
+          "Retype new SMB password:": "pass"
+
+    - name: Enable smb service
+      become: true
+      service:
+        name: smb
+        enabled: yes
+        state: started
+
+    - name: Configure firewall to allow Samba
+      firewalld:
+        service: samba
+        permanent: yes
+        state: enabled
+
+    - name: Reload firewall configuration (firewalld)
+      command: firewall-cmd --reload
+      become: true
+
+    - name: Restart smb service
+      become: true
+      service:
+        name: smb
+        state: restarted
+
+    - name: Enable steamdeck readonly
+      include_role:
+        name: steamdeck
+        tasks_from: enable_readonly.yml

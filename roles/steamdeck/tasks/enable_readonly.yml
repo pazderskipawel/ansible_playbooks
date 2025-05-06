@@ -1,0 +1,3 @@
+    - name: Execute steamos-readonly enable
+      become: true
+      command: sudo steamos-readonly enable

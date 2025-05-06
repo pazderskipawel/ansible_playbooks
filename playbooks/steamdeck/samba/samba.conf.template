@@ -1,0 +1,22 @@
+[global]
+netbios name = steamdeck
+
+[emulators]
+comment = Steam apps directory
+path = /home/deck/Emulation
+browseable = yes
+read only = no
+create mask = 0777
+directory mask = 0777
+force user = deck
+force group = deck
+
+[scripts]
+comment = Steam apps directory
+path = /home/deck/scripts
+browseable = yes
+read only = no
+create mask = 0777
+directory mask = 0777
+force user = deck
+force group = deck
