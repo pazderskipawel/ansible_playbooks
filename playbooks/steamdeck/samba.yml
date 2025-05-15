@@ -1,8 +1,11 @@
 ---
 - name: Configure Samba on Steam Deck
   hosts: steamdeck1
-  roles: 
+
+  roles:
+    - base
     - arch_pacman
+    - steamdeck
 
   tasks:
     - name: Disable steamdeck readonly
@@ -15,27 +18,30 @@
       pacman:
         name: samba
         state: present
+      register: samba_install
 
     - name: Copy samba configuration from template
       become: true
       copy:
-        src: samba/samba.conf.template
+        src: "{{ file_path }}/samba/samba.conf.template"
         dest: /etc/samba/smb.conf
+      when: samba_install.changed
 
     - name: Check if pexpect is installed
       command: python -c "import pexpect"
       register: pexpect_check
       ignore_errors: true
+      when: samba_install.changed
 
     - name: Install pexpect if not present
       pip:
         name: pexpect
-      when: pexpect_check.rc != 0
-
+      when: pexpect_check.changed
 
     - name: Get Samba user credentials
       include_vars: 
-        file: samba/var.yml
+        file: "{{ file_path }}/samba/var.yml"
+      when: samba_install.changed
 
     - name: Set Samba user
       become: true
@@ -44,6 +50,7 @@
         responses:
           "New SMB password:": "{{ samba_user_password }}"
           "Retype new SMB password:": "{{ samba_user_password }}"
+      when: samba_install.changed
 
     - name: Enable smb service
       become: true
@@ -51,22 +58,27 @@
         name: smb
         enabled: yes
         state: started
+      when: samba_install.changed
 
     - name: Configure firewall to allow Samba
+      become: true
       firewalld:
         service: samba
         permanent: yes
         state: enabled
+      when: samba_install.changed
 
     - name: Reload firewall configuration (firewalld)
       command: firewall-cmd --reload
       become: true
+      when: samba_install.changed
 
     - name: Restart smb service
       become: true
       service:
         name: smb
         state: restarted
+      when: samba_install.changed
 
     - name: Enable steamdeck readonly
       include_role:

@@ -1,0 +1,10 @@
+    - name: Initialize pacman keyring
+      become: true
+      command: sudo -S pacman-key --init
+
+    - name: Populate pacman keyring (archlinux and holo)
+      # This is a workaround for the issue with pacman-key not being able to find the keyring
+      become: true
+      shell: |
+        sudo -S pacman-key --populate archlinux
+        sudo -S pacman-key --populate holo

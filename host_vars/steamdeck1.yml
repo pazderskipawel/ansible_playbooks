@@ -1,3 +1,1 @@
-ansible_user: "deck"
-ansible_sudo_pass: "@dm!n"
-ansible_ssh_private_key_file: "~/.ssh/ansible_ed25519"
+file_path: ~/.ansible/roles/steamdeck/files/
