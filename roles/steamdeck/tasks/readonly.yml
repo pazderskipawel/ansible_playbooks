@@ -1,0 +1,3 @@
+    - name: Readonly {{ readonly_state }}
+      become: true
+      command: sudo steamos-readonly {{ readonly_state }}

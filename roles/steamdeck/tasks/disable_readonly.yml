@@ -1,3 +1,0 @@
-    - name: Execute steamos-readonly disable
-      become: true
-      command: sudo steamos-readonly disable

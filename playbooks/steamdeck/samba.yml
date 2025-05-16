@@ -1,5 +1,5 @@
 ---
-- name: Configure Samba on Steam Deck
+- name: Install and configure Samba on SteamDeck
   hosts: steamdeck1
 
   roles:
@@ -11,7 +11,9 @@
     - name: Disable steamdeck readonly
       include_role:
         name: steamdeck
-        tasks_from: disable_readonly.yml
+        tasks_from: readonly.yml
+      vars:
+        readonly_state: "disable"
 
     - name: Install Samba packages
       become: true
@@ -84,3 +86,5 @@
       include_role:
         name: steamdeck
         tasks_from: enable_readonly.yml
+      vars:
+        readonly_state: "enable"

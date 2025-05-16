@@ -33,3 +33,28 @@
     state: present
     key: "{{ lookup('file', '/home/pawel/.ssh/ansible_ed25519.pub') }}"
   when: check_ansible_user.changed
+
+  - name: Update package cache (all distros)
+  become: true
+  package:
+    update_cache: yes
+
+- name: Upgrade all packages on Arch
+  become: true
+  pacman:
+    upgrade: yes
+  when: ansible_facts['os_family'] == "Archlinux"
+
+- name: Upgrade all packages on Debian/Ubuntu
+  become: true
+  apt:
+    upgrade: dist
+    update_cache: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Upgrade all packages on RedHat/CentOS/Fedora
+  become: true
+  yum:
+    name: '*'
+    state: latest
+  when: ansible_facts['os_family'] == "RedHat"
